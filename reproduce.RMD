@@ -13,16 +13,25 @@ require(markdown)
    
 ```{r  eval=TRUE,echo=FALSE}  
 setwd("C:\\Users\\John\\Documents\\courses\\coursera\\GettingCleaningData")  
-temp <- tempfile()  
-setInternet2(TRUE)  
-fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"  
-download.file(fileUrl,temp)  
-unzip(temp)   
-unlink(temp)  
+
+
+if(FALSE){
+  temp <- tempfile()  
+  setInternet2(TRUE)  
+  fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"  
+  download.file(fileUrl,temp)  
+  unzip(temp)   
+  unlink(temp)  
+}
 ```
-```{r}
+  
+  
+```{r}  
+
 UHD="UCI HAR Dataset"  
-list.files(UHD, recursive = TRUE)  
+
+list.files(UHD, recursive = TRUE) 
+
 ```
 
 ```{r echo=FALSE}
@@ -98,3 +107,4 @@ write.table(tidy_data,file="the_average_activities_per_subject.txt",sep=",",row.
 ```{r echo=FALSE}  
 knit("output_Codebook.RMD", output = "Codebook.md", encoding = "ISO8859-1", quiet = TRUE)  
 ```  
+
