@@ -1,0 +1,32 @@
+---
+title: "output_Codebook.md"
+author: "Johnxz"
+date: "Sunday, May 24, 2015"
+output: html_document
+---
+
+Codebook
+========
+
+
+Tidy Dataset structure
+-----------------
+
+```{r}
+str(tidy_data)
+```
+
+
+Head of the tidy dataset
+------------------------------
+
+```{r}
+tidy_data[1:12,1:6]
+```
+
+Summary of variables in the tidy dataset
+--------------------
+
+```{r}
+summary(tidy_data,maxsum =5)
+```
