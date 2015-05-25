@@ -63,58 +63,123 @@ img {
 
 <div id="reproduce-the-course-project-analysis" class="section level1">
 <h1>Reproduce the Course Project Analysis</h1>
-<p>Last updated <code>r as.character(Sys.time())</code> .</p>
-<p><code>{r echo=FALSE}   require(knitr) require(markdown)</code></p>
-<p><code>{r  eval=TRUE,echo=FALSE}   setwd(&quot;C:\\Users\\John\\Documents\\courses\\coursera\\GettingCleaningData&quot;)   temp &lt;- tempfile()   setInternet2(TRUE)   fileUrl &lt;- &quot;https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip&quot;   download.file(fileUrl,temp)   unzip(temp)    unlink(temp)</code></p>
-<pre class="{r}"><code>UHD=&quot;UCI HAR Dataset&quot;  
-list.files(UHD, recursive = TRUE)  </code></pre>
-<p>```{r echo=FALSE}</p>
-</div>
-<div id="read-the-needed-data-files" class="section level1">
-<h1>Read the needed data files</h1>
-</div>
-<div id="x_-files-contain-subjects-data-y_-files-contain-activity-labels" class="section level1">
-<h1>x_ files contain subjects’ data; y_ files contain activity labels</h1>
-<p>x_train &lt;- read.table(file=file.path(UHD,“train/X_train.txt”))<br />y_train &lt;- read.table(file=file.path(UHD,“train/y_train.txt”))<br />subject_train &lt;- read.table(file=file.path(UHD,“train/subject_train.txt”)) #identifier of the subject in the train grp</p>
-</div>
-<div id="x_-files-contain-subjects-data-y_-files-contain-activity-labels-1" class="section level1">
-<h1>x_ files contain subjects’ data; y_ files contain activity labels</h1>
-<p>x_test &lt;- read.table(file=file.path(UHD,“test/X_test.txt”), sep=“”)<br />y_test &lt;- read.table(file=file.path(UHD,“test/y_test.txt”), sep=“”)<br />subject_test &lt;- read.table(file=file.path(UHD,“test/subject_test.txt”)) #identifier of the subject in test grp</p>
-</div>
-<div id="the-feature-vector-with-time-and-frequency-domain-variables" class="section level1">
-<h1>the feature vector with time and frequency domain variables</h1>
-<p>variable_names &lt;- read.table(file=file.path(UHD,“features.txt”))</p>
-</div>
-<div id="links-the-class-labels-with-their-activity-name" class="section level1">
-<h1>links the class labels with their activity name</h1>
-<p>activity_names &lt;- read.table(file=file.path(UHD,“activity_labels.txt”))</p>
-</div>
-<div id="merge-test-and-train-data-using-dplyr-functions" class="section level1">
-<h1>Merge test and train data using ‘dplyr’ functions</h1>
-<p>library(dplyr)<br />dat_df &lt;- bind_rows(x_train,x_test)</p>
-</div>
-<div id="extracts-only-the-measurements-on-the-mean-and-standard-deviation-for-each-measurement" class="section level1">
-<h1>Extracts only the measurements on the mean and standard deviation for each measurement</h1>
-<p>ms_col &lt;-<br /> variable_names %&gt;%<br /> mutate(ms_col=paste0(“V”,V1)) %&gt;%<br /> filter(grepl(“mean|std”,V2))</p>
-<p>MS_col &lt;- dput(as.character(ms_col$ms_col))</p>
-<p>MeanSD &lt;-<br /> dat_df %&gt;%<br /> select(one_of(MS_col))</p>
-</div>
-<div id="uses-descriptive-activity-names-to-name-the-activities-in-the-data-set" class="section level1">
-<h1>Uses descriptive activity names to name the activities in the data set</h1>
-<p>labels_df &lt;- bind_rows(y_train,y_test)</p>
-<p>labeledMeanSD &lt;-<br /> labels_df %&gt;%<br /> inner_join(activity_names,by=c(“V1”=“V1”)) %&gt;%<br /> select(-V1) %&gt;%<br /> rename(activity=V2) %&gt;%<br /> bind_cols(MeanSD)</p>
-</div>
-<div id="appropriately-labels-the-data-set-with-descriptive-variable-names" class="section level1">
-<h1>Appropriately labels the data set with descriptive variable names</h1>
-<p>descriptive_variable_names &lt;- dput(as.character(ms_col$V2))<br />colnames(labeledMeanSD)[2:ncol(labeledMeanSD)] &lt;- descriptive_variable_names</p>
-</div>
-<div id="make-independent-tidy-data-set-with-the-average-of-each-variable-for-each-activity-and-each-subject." class="section level1">
-<h1>Make independent tidy data set with the average of each variable for each activity and each subject.</h1>
-<p>subject_df &lt;-<br /> bind_rows(subject_train,subject_test) %&gt;%<br /> rename(subject=V1)</p>
-<p>named_labeledMeanSD &lt;- bind_cols(subject_df,labeledMeanSD)</p>
-<p>tidy_data &lt;-<br /> named_labeledMeanSD %&gt;%<br /> group_by(subject,activity) %&gt;%<br /> summarise_each(funs(mean))</p>
-<p>write.table(tidy_data,file=“the_average_activities_per_subject.txt”,sep=“,”,row.name=FALSE)<br />```</p>
-<p><code>{r echo=FALSE}   knit(&quot;output_Codebook.RMD&quot;, output = &quot;Codebook.md&quot;, encoding = &quot;ISO8859-1&quot;, quiet = TRUE)</code></p>
+<p>Last updated @ 2015-05-25 06:39:36</p>
+<pre><code>## Loading required package: knitr
+## Loading required package: markdown</code></pre>
+<pre><code>##  [1] &quot;activity_labels.txt&quot;                         
+##  [2] &quot;features.txt&quot;                                
+##  [3] &quot;features_info.txt&quot;                           
+##  [4] &quot;README.txt&quot;                                  
+##  [5] &quot;test/Inertial Signals/body_acc_x_test.txt&quot;   
+##  [6] &quot;test/Inertial Signals/body_acc_y_test.txt&quot;   
+##  [7] &quot;test/Inertial Signals/body_acc_z_test.txt&quot;   
+##  [8] &quot;test/Inertial Signals/body_gyro_x_test.txt&quot;  
+##  [9] &quot;test/Inertial Signals/body_gyro_y_test.txt&quot;  
+## [10] &quot;test/Inertial Signals/body_gyro_z_test.txt&quot;  
+## [11] &quot;test/Inertial Signals/total_acc_x_test.txt&quot;  
+## [12] &quot;test/Inertial Signals/total_acc_y_test.txt&quot;  
+## [13] &quot;test/Inertial Signals/total_acc_z_test.txt&quot;  
+## [14] &quot;test/subject_test.txt&quot;                       
+## [15] &quot;test/X_test.txt&quot;                             
+## [16] &quot;test/y_test.txt&quot;                             
+## [17] &quot;the_average_activities_per_subject.csv&quot;      
+## [18] &quot;train/Inertial Signals/body_acc_x_train.txt&quot; 
+## [19] &quot;train/Inertial Signals/body_acc_y_train.txt&quot; 
+## [20] &quot;train/Inertial Signals/body_acc_z_train.txt&quot; 
+## [21] &quot;train/Inertial Signals/body_gyro_x_train.txt&quot;
+## [22] &quot;train/Inertial Signals/body_gyro_y_train.txt&quot;
+## [23] &quot;train/Inertial Signals/body_gyro_z_train.txt&quot;
+## [24] &quot;train/Inertial Signals/total_acc_x_train.txt&quot;
+## [25] &quot;train/Inertial Signals/total_acc_y_train.txt&quot;
+## [26] &quot;train/Inertial Signals/total_acc_z_train.txt&quot;
+## [27] &quot;train/subject_train.txt&quot;                     
+## [28] &quot;train/X_train.txt&quot;                           
+## [29] &quot;train/y_train.txt&quot;</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre><code>## c(&quot;V1&quot;, &quot;V2&quot;, &quot;V3&quot;, &quot;V4&quot;, &quot;V5&quot;, &quot;V6&quot;, &quot;V41&quot;, &quot;V42&quot;, &quot;V43&quot;, &quot;V44&quot;, 
+## &quot;V45&quot;, &quot;V46&quot;, &quot;V81&quot;, &quot;V82&quot;, &quot;V83&quot;, &quot;V84&quot;, &quot;V85&quot;, &quot;V86&quot;, &quot;V121&quot;, 
+## &quot;V122&quot;, &quot;V123&quot;, &quot;V124&quot;, &quot;V125&quot;, &quot;V126&quot;, &quot;V161&quot;, &quot;V162&quot;, &quot;V163&quot;, 
+## &quot;V164&quot;, &quot;V165&quot;, &quot;V166&quot;, &quot;V201&quot;, &quot;V202&quot;, &quot;V214&quot;, &quot;V215&quot;, &quot;V227&quot;, 
+## &quot;V228&quot;, &quot;V240&quot;, &quot;V241&quot;, &quot;V253&quot;, &quot;V254&quot;, &quot;V266&quot;, &quot;V267&quot;, &quot;V268&quot;, 
+## &quot;V269&quot;, &quot;V270&quot;, &quot;V271&quot;, &quot;V294&quot;, &quot;V295&quot;, &quot;V296&quot;, &quot;V345&quot;, &quot;V346&quot;, 
+## &quot;V347&quot;, &quot;V348&quot;, &quot;V349&quot;, &quot;V350&quot;, &quot;V373&quot;, &quot;V374&quot;, &quot;V375&quot;, &quot;V424&quot;, 
+## &quot;V425&quot;, &quot;V426&quot;, &quot;V427&quot;, &quot;V428&quot;, &quot;V429&quot;, &quot;V452&quot;, &quot;V453&quot;, &quot;V454&quot;, 
+## &quot;V503&quot;, &quot;V504&quot;, &quot;V513&quot;, &quot;V516&quot;, &quot;V517&quot;, &quot;V526&quot;, &quot;V529&quot;, &quot;V530&quot;, 
+## &quot;V539&quot;, &quot;V542&quot;, &quot;V543&quot;, &quot;V552&quot;)</code></pre>
+<pre><code>## c(&quot;tBodyAcc-mean()-X&quot;, &quot;tBodyAcc-mean()-Y&quot;, &quot;tBodyAcc-mean()-Z&quot;, 
+## &quot;tBodyAcc-std()-X&quot;, &quot;tBodyAcc-std()-Y&quot;, &quot;tBodyAcc-std()-Z&quot;, &quot;tGravityAcc-mean()-X&quot;, 
+## &quot;tGravityAcc-mean()-Y&quot;, &quot;tGravityAcc-mean()-Z&quot;, &quot;tGravityAcc-std()-X&quot;, 
+## &quot;tGravityAcc-std()-Y&quot;, &quot;tGravityAcc-std()-Z&quot;, &quot;tBodyAccJerk-mean()-X&quot;, 
+## &quot;tBodyAccJerk-mean()-Y&quot;, &quot;tBodyAccJerk-mean()-Z&quot;, &quot;tBodyAccJerk-std()-X&quot;, 
+## &quot;tBodyAccJerk-std()-Y&quot;, &quot;tBodyAccJerk-std()-Z&quot;, &quot;tBodyGyro-mean()-X&quot;, 
+## &quot;tBodyGyro-mean()-Y&quot;, &quot;tBodyGyro-mean()-Z&quot;, &quot;tBodyGyro-std()-X&quot;, 
+## &quot;tBodyGyro-std()-Y&quot;, &quot;tBodyGyro-std()-Z&quot;, &quot;tBodyGyroJerk-mean()-X&quot;, 
+## &quot;tBodyGyroJerk-mean()-Y&quot;, &quot;tBodyGyroJerk-mean()-Z&quot;, &quot;tBodyGyroJerk-std()-X&quot;, 
+## &quot;tBodyGyroJerk-std()-Y&quot;, &quot;tBodyGyroJerk-std()-Z&quot;, &quot;tBodyAccMag-mean()&quot;, 
+## &quot;tBodyAccMag-std()&quot;, &quot;tGravityAccMag-mean()&quot;, &quot;tGravityAccMag-std()&quot;, 
+## &quot;tBodyAccJerkMag-mean()&quot;, &quot;tBodyAccJerkMag-std()&quot;, &quot;tBodyGyroMag-mean()&quot;, 
+## &quot;tBodyGyroMag-std()&quot;, &quot;tBodyGyroJerkMag-mean()&quot;, &quot;tBodyGyroJerkMag-std()&quot;, 
+## &quot;fBodyAcc-mean()-X&quot;, &quot;fBodyAcc-mean()-Y&quot;, &quot;fBodyAcc-mean()-Z&quot;, 
+## &quot;fBodyAcc-std()-X&quot;, &quot;fBodyAcc-std()-Y&quot;, &quot;fBodyAcc-std()-Z&quot;, &quot;fBodyAcc-meanFreq()-X&quot;, 
+## &quot;fBodyAcc-meanFreq()-Y&quot;, &quot;fBodyAcc-meanFreq()-Z&quot;, &quot;fBodyAccJerk-mean()-X&quot;, 
+## &quot;fBodyAccJerk-mean()-Y&quot;, &quot;fBodyAccJerk-mean()-Z&quot;, &quot;fBodyAccJerk-std()-X&quot;, 
+## &quot;fBodyAccJerk-std()-Y&quot;, &quot;fBodyAccJerk-std()-Z&quot;, &quot;fBodyAccJerk-meanFreq()-X&quot;, 
+## &quot;fBodyAccJerk-meanFreq()-Y&quot;, &quot;fBodyAccJerk-meanFreq()-Z&quot;, &quot;fBodyGyro-mean()-X&quot;, 
+## &quot;fBodyGyro-mean()-Y&quot;, &quot;fBodyGyro-mean()-Z&quot;, &quot;fBodyGyro-std()-X&quot;, 
+## &quot;fBodyGyro-std()-Y&quot;, &quot;fBodyGyro-std()-Z&quot;, &quot;fBodyGyro-meanFreq()-X&quot;, 
+## &quot;fBodyGyro-meanFreq()-Y&quot;, &quot;fBodyGyro-meanFreq()-Z&quot;, &quot;fBodyAccMag-mean()&quot;, 
+## &quot;fBodyAccMag-std()&quot;, &quot;fBodyAccMag-meanFreq()&quot;, &quot;fBodyBodyAccJerkMag-mean()&quot;, 
+## &quot;fBodyBodyAccJerkMag-std()&quot;, &quot;fBodyBodyAccJerkMag-meanFreq()&quot;, 
+## &quot;fBodyBodyGyroMag-mean()&quot;, &quot;fBodyBodyGyroMag-std()&quot;, &quot;fBodyBodyGyroMag-meanFreq()&quot;, 
+## &quot;fBodyBodyGyroJerkMag-mean()&quot;, &quot;fBodyBodyGyroJerkMag-std()&quot;, 
+## &quot;fBodyBodyGyroJerkMag-meanFreq()&quot;)</code></pre>
+<pre><code>## 
+## 
+## processing file: output_Codebook.RMD</code></pre>
+<pre><code>## 
+  |                                                                       
+  |                                                                 |   0%
+  |                                                                       
+  |.........                                                        |  14%
+##   ordinary text without R code
+## 
+## 
+  |                                                                       
+  |...................                                              |  29%
+## label: unnamed-chunk-5
+## 
+  |                                                                       
+  |............................                                     |  43%
+##   ordinary text without R code
+## 
+## 
+  |                                                                       
+  |.....................................                            |  57%
+## label: unnamed-chunk-6
+## 
+  |                                                                       
+  |..............................................                   |  71%
+##   ordinary text without R code
+## 
+## 
+  |                                                                       
+  |........................................................         |  86%
+## label: unnamed-chunk-7
+## 
+  |                                                                       
+  |.................................................................| 100%
+##   ordinary text without R code</code></pre>
+<pre><code>## output file: Codebook.md</code></pre>
+<pre><code>## [1] &quot;Codebook.md&quot;</code></pre>
 </div>
 
 

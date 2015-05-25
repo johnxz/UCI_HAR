@@ -8,7 +8,7 @@ Mainly utilize 'dplyr' functions to make and clean-up the dataset:
 - Use 'filter(grepl("mean|std",))' function to extract variables_names of mean and standard deviation measurements for activities; then 'select' the mean and std colume of activity measurments from the test and train combined dataset 
 - To name the activities in the merged dataset using descriptive activity names : Use 'join' function to label the combined activity label dataset(Y) by match the descriptive names in the "activity_labels.txt" file, then bind the column of names to the extracted mean and std dataset and name it as new viriable 'activity'.
 - Appropriately labels the data set with descriptive variable names: don't know how to use dplyr functions to do it, have to use base function dput() and colnames() to rename all activity measurement columns with descriptive activity variable names (see below the prinout of resulted dataset). 
-- Make independent tidy data set with the average of each variable for each activity and each subject: use 'bind" train and test subject rows and then bind the combined subject column with labeled mean and std dataset, name it as new viriable 'subject' and then tide data using 'group_by' on the variable combination of subject and activity, summarise each group
+- Make independent tidy data set with the average of each variable for each activity and each subject: use 'bind" train and test subject rows and then bind the combined subject column with labeled mean and std dataset, name it as new viriable 'subject'; calculate average of all mean and std variales for each activity and each subject by 'group_by' and 'summarize', then use 'gather' function of 'tidyr' package to gather  all averages of mean  and std and collapse into the new key column 'variable' and the new value column 'average'.
 
 
 Tidy Dataset structure
@@ -20,16 +20,16 @@ str(tidy_data)
 
 
 Head of the tidy dataset
-------------------------------
+-------------------------
 
 ```{r}
-tidy_data[1:12,1:6]
+head(tidy_data,n=12)
 ```
 
 Summary of variables in the tidy dataset
---------------------
+-----------------------------------------
 
-```{r echo=FALSE}
-summary(tidy_data,maxsum =5)
+```{r}
+summary(tidy_data)
 ```
 
