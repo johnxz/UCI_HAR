@@ -9,7 +9,7 @@ unzip(temp)
 unlink(temp)
 
 # Read the needed data files
-UHD=""UCI\ HAR\ Dataset""
+UHD="UCI\ HAR\ Dataset"
 list.files(UHD, recursive = TRUE)
 #
 x_train <- read.table(file=file.path(UHD,"train/X_train.txt"))
@@ -60,10 +60,13 @@ subject_df <-
 #
 named_labeledMeanSD <- bind_cols(subject_df,labeledMeanSD)
 #
+library(tidyr)
 tidy_data <- 
   named_labeledMeanSD %>%
   group_by(subject,activity) %>%
-  summarise_each(funs(mean))
+  summarise_each(funs(mean)) %>%
+  gather(variable, average, -subject,-activity)
+  
 
 # Write the tidy dataset created in step 5 as a txt file 
 write.table(tidy_data,file="the_average_activities_per_subject.txt",sep="\t",row.name=FALSE)
